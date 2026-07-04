@@ -1,0 +1,7 @@
+# AutoCTO own dependencies. The Personal LLM core (for prose commentary) is installed
+# separately as an editable sibling: pip install -e ../personal-llm
+# The `gh` CLI (GitHub CLI) must be installed and authenticated for issue triage.
+pydantic>=2.6
+pydantic-settings>=2.2
+typer>=0.12
+pytest>=8.0

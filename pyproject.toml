@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autocto"
+version = "0.1.0"
+description = "AutoCTO - the engineering-manager layer of the GitHub PR Agent: analyze, report, triage, plan."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Zaid Ali Syed" }]
+license = { text = "Proprietary - no license granted for reuse yet" }
+# personal-llm is a local sibling package (used only for prose commentary), installed editable
+# from ../personal-llm; the CLI degrades gracefully if the model is unavailable.
+dependencies = [
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+autocto = "autocto.interfaces.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

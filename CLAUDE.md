@@ -1,0 +1,39 @@
+# GitHub PR Agent (AutoCTO) - Claude Instructions
+
+Engineering-manager layer of the GitHub PR Agent (project #3 in `../ROADMAP.md`). Analyzes a
+repo, reports on it, triages issues, and drafts a PR plan. Implementation is the `/github-pr`
+skill's job, not this project's.
+
+## Run
+
+```powershell
+cd C:\Users\Asus\projects\ai-ecosystem\github-pr-agent
+& "venv\Scripts\python" -m autocto.interfaces.cli --help
+```
+
+## Python environment
+
+- Venv `venv`, **Python 3.12**. `py -3.12 -m venv venv`
+- Install: `-r requirements.txt`, then the core deps `-r ..\personal-llm\requirements.txt`,
+  then `-e ..\personal-llm`, then `-e .`. The core is used only for prose commentary.
+- `gh` (GitHub CLI) must be installed and authenticated for triage/plan.
+
+## Tests
+
+```powershell
+& "venv\Scripts\python" -m pytest tests/ -q
+```
+Logic modules (`repo`, `issues`, `report`, `plan`, `github`) inject callables/fake data and have
+no `personal_llm` or network dependency, so tests run offline. Keep `gh`/`personal_llm` imports
+inside CLI command bodies (lazy) only.
+
+## Scope discipline
+
+- This project does analysis and planning; it must not attempt to write or open PRs itself.
+  That belongs to the `/github-pr` skill (Claude Code), which needs no API keys.
+- The `plan` command's output is the handoff contract between the two.
+
+## Gotchas
+
+- Never use the em dash character (U+2014); use " - ". In tests that must reference it, use `chr(0x2014)`.
+- `data/` is gitignored (reports, plans). Keep generated artifacts there.
