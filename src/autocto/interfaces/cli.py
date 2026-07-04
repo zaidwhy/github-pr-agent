@@ -40,7 +40,11 @@ def analyze(path: Path = typer.Argument(Path("."), help="Local repo path.")) -> 
     """Summarize a local repository (languages, deps, layout)."""
     from autocto.repo import scan_repo
 
-    a = scan_repo(path, get_settings().ignore_dirs)
+    try:
+        a = scan_repo(path, get_settings().ignore_dirs)
+    except OSError as exc:
+        typer.echo(f"Error: {exc}")
+        raise typer.Exit(1)
     typer.echo(f"Repo: {a.root}")
     typer.echo(f"Primary language: {a.primary_language or 'unknown'}")
     typer.echo(f"Files: {a.total_files} | deps: {', '.join(a.dep_files) or 'none'}")
@@ -80,7 +84,11 @@ def report(
     from autocto.repo import scan_repo
     from autocto.report import build_report
 
-    analysis = scan_repo(path, get_settings().ignore_dirs)
+    try:
+        analysis = scan_repo(path, get_settings().ignore_dirs)
+    except OSError as exc:
+        typer.echo(f"Error: {exc}")
+        raise typer.Exit(1)
     ranked = []
     if repo:
         from autocto.github import GhNotAvailable, fetch_issues
@@ -120,7 +128,11 @@ def plan(
     if match is None:
         typer.echo(f"Issue #{number} not found among open issues.")
         raise typer.Exit(1)
-    analysis = scan_repo(path, get_settings().ignore_dirs)
+    try:
+        analysis = scan_repo(path, get_settings().ignore_dirs)
+    except OSError as exc:
+        typer.echo(f"Error: {exc}")
+        raise typer.Exit(1)
     markdown = build_pr_plan(match, analysis, _llm())
     if out:
         out.write_text(markdown, encoding="utf-8")

@@ -44,10 +44,12 @@ class RepoAnalysis:
 
 def scan_repo(path: str | Path, ignore_dirs: tuple[str, ...] = ()) -> RepoAnalysis:
     root = Path(path)
+    if not root.exists():
+        raise FileNotFoundError(f"Path does not exist: {root}")
+    if not root.is_dir():
+        raise NotADirectoryError(f"Not a directory: {root}")
     ignore = set(ignore_dirs)
     analysis = RepoAnalysis(root=str(root))
-    if not root.exists():
-        return analysis
 
     analysis.top_level_dirs = sorted(
         p.name for p in root.iterdir() if p.is_dir() and p.name not in ignore

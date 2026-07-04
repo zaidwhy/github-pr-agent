@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from autocto.config import get_settings
 from autocto.repo import scan_repo
 
@@ -33,6 +35,14 @@ def test_scan_basic(tmp_path):
     assert "node_modules" not in a.top_level_dirs
 
 
-def test_scan_missing_dir(tmp_path):
-    a = scan_repo(tmp_path / "nope")
-    assert a.total_files == 0 and a.primary_language is None
+def test_scan_missing_path_raises(tmp_path):
+    # A missing path must not look like a valid but empty repo.
+    with pytest.raises(FileNotFoundError):
+        scan_repo(tmp_path / "nope")
+
+
+def test_scan_non_directory_raises(tmp_path):
+    f = tmp_path / "file.txt"
+    _write(f)
+    with pytest.raises(NotADirectoryError):
+        scan_repo(f)
