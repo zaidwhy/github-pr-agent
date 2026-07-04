@@ -17,14 +17,22 @@ app = typer.Typer(help="AutoCTO - understand a repo, report on it, triage issues
 
 
 def _llm():
-    """An llm(prompt)->str backed by the free Personal LLM router (Ollama/Gemini, no new keys)."""
+    """An llm(prompt)->str backed by the free Personal LLM router (Ollama/Gemini, no new keys).
+
+    Never raises: if the Personal LLM core is not installed or the router cannot be built, it
+    returns a stub that reports the reason, so the structural report/plan still gets produced.
+    """
     import os
 
     os.environ.setdefault("OLLAMA_MODEL", get_settings().ollama_model)
-    from personal_llm.router import ModelRouter
-    from personal_llm.router.schemas import Message
+    try:
+        from personal_llm.router import ModelRouter
+        from personal_llm.router.schemas import Message
 
-    router = ModelRouter()
+        router = ModelRouter()
+    except Exception as exc:  # core not installed, or the router failed to initialize
+        note = f"(model unavailable: {exc})"
+        return lambda _prompt: note
 
     def llm(prompt: str) -> str:
         try:
@@ -59,13 +67,13 @@ def triage(
     limit: int = typer.Option(30, help="Max issues to fetch."),
 ) -> None:
     """List and rank open issues, best first-issue candidates first."""
-    from autocto.github import GhNotAvailable, fetch_issues
+    from autocto.github import GhError, fetch_issues
     from autocto.issues import parse_issues, rank_issues
 
     try:
         ranked = rank_issues(parse_issues(fetch_issues(repo, label=label, limit=limit)))
-    except GhNotAvailable as exc:
-        typer.echo(str(exc))
+    except GhError as exc:
+        typer.echo(f"Error: {exc}")
         raise typer.Exit(1)
     if not ranked:
         typer.echo("No open issues found.")
@@ -91,13 +99,14 @@ def report(
         raise typer.Exit(1)
     ranked = []
     if repo:
-        from autocto.github import GhNotAvailable, fetch_issues
+        from autocto.github import GhError, fetch_issues
         from autocto.issues import parse_issues, rank_issues
 
         try:
             ranked = rank_issues(parse_issues(fetch_issues(repo)))
-        except GhNotAvailable as exc:
-            typer.echo(str(exc))
+        except GhError as exc:
+            # A local report is still worth writing even if the issue fetch failed.
+            typer.echo(f"Warning: could not fetch issues: {exc}")
     markdown = build_report(analysis, ranked, llm=_llm())
     if out:
         out.write_text(markdown, encoding="utf-8")
@@ -114,15 +123,15 @@ def plan(
     out: Path = typer.Option(None, help="Write the plan here instead of printing."),
 ) -> None:
     """Draft a PR plan for a specific issue - the handoff artifact for /github-pr."""
-    from autocto.github import GhNotAvailable, fetch_issues
+    from autocto.github import GhError, fetch_issues
     from autocto.issues import parse_issues
     from autocto.plan import build_pr_plan
     from autocto.repo import scan_repo
 
     try:
         issues = parse_issues(fetch_issues(repo, limit=100))
-    except GhNotAvailable as exc:
-        typer.echo(str(exc))
+    except GhError as exc:
+        typer.echo(f"Error: {exc}")
         raise typer.Exit(1)
     match = next((i for i in issues if i.number == number), None)
     if match is None:
