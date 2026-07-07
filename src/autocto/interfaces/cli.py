@@ -109,6 +109,7 @@ def report(
             typer.echo(f"Warning: could not fetch issues: {exc}")
     markdown = build_report(analysis, ranked, llm=_llm())
     if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(markdown, encoding="utf-8")
         typer.echo(f"Wrote {out}")
     else:
@@ -144,6 +145,7 @@ def plan(
         raise typer.Exit(1)
     markdown = build_pr_plan(match, analysis, _llm())
     if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(markdown, encoding="utf-8")
         typer.echo(f"Wrote {out}")
     else:
