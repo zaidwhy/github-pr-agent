@@ -9,7 +9,7 @@ description = "AutoCTO - the engineering-manager layer of the GitHub PR Agent: a
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Zaid Ali Syed" }]
-license = { text = "Proprietary - no license granted for reuse yet" }
+license = { text = "MIT" }
 # personal-llm is a local sibling package (used only for prose commentary), installed editable
 # from ../personal-llm; the CLI degrades gracefully if the model is unavailable.
 dependencies = [
@@ -29,3 +29,4 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+

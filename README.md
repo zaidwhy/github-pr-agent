@@ -1,7 +1,12 @@
 # GitHub PR Agent - AutoCTO
 
-**The AI Staff Engineer every repository deserves.** Project #3 in the
-[AI ecosystem roadmap](../ROADMAP.md).
+[![CI](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml)
+![Tests](https://img.shields.io/badge/tests-32%20passed%20offline-brightgreen)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+**The AI Staff Engineer every repository deserves.** Project #3 in a larger local-first
+AI ecosystem built on the [Personal LLM](https://github.com/syzayd/personal-llm) core.
 
 This repo is the **engineering-manager layer**: it understands a repository, reports on its
 health, triages its issues, and drafts a pull-request plan. It deliberately does **not** write
@@ -9,8 +14,9 @@ the code. On the free/local model the ecosystem uses, analysis and planning are 
 code generation is not - so implementation is handed to the **`/github-pr` Claude Code skill**,
 which does the real PR work (write the fix, run tests, open the PR after your approval).
 
-> **One-click run:** the ecosystem launcher one level up (`..\run.cmd`) can run this alongside
-> the other projects. Or use it standalone below.
+Its pattern is proven: the manager layer triaged a real issue, the implementer skill
+wrote the fix, and the resulting PR ([#2](https://github.com/syzayd/github-pr-agent/pull/2),
+a hardening pass with the full 32-test suite) was reviewed and merged.
 
 ## What it does
 
@@ -23,10 +29,14 @@ which does the real PR work (write the fix, run tests, open the PR after your ap
 Triage/report/plan reuse the authenticated `gh` CLI for GitHub data and the free Personal LLM
 router (Gemini free tier or local Ollama) only for the prose. No new API keys.
 
-## Setup
+## Setup (under 5 minutes)
+
+Clone this repo and the core side by side, then install both:
 
 ```powershell
-cd C:\Users\Asus\projects\ai-ecosystem\github-pr-agent
+git clone https://github.com/syzayd/personal-llm
+git clone https://github.com/syzayd/github-pr-agent
+cd github-pr-agent
 py -3.12 -m venv venv
 & "venv\Scripts\python" -m pip install -r requirements.txt
 
@@ -67,8 +77,26 @@ opening a PR. Together, AutoCTO scopes the work and the skill does it.
 & "venv\Scripts\python" -m pytest tests/ -q
 ```
 
-The logic modules (`repo`, `issues`, `report`, `plan`, `github`) take injected callables and
-fake data - no `gh`, network, or model needed - so the suite runs fully offline. Only the CLI
-touches `gh` and Personal LLM, and it imports them lazily.
+32 tests. The logic modules (`repo`, `issues`, `report`, `plan`, `github`) take injected
+callables and fake data - no `gh`, network, or model needed - so the suite runs fully
+offline (CI runs it keyless on every push). Only the CLI touches `gh` and Personal LLM,
+and it imports them lazily. Hardened invariants: every `gh` failure becomes a readable
+`GhError` (exit 1, no traceback), the LLM degrades to a stub if the core is missing, and
+repo scanning is deterministic.
 
-North-star vision: `C:\Users\Asus\Documents\fable 5\github pr.txt`.
+## Demo
+
+<!-- TODO(zaid): record a real 30-second GIF - `triage` a known repo, then `plan` one
+issue and show the generated pr-plan.md. Never fabricate. -->
+Demo GIF coming soon. Until then, `analyze` on any local repo runs offline with zero setup
+beyond the Quickstart.
+
+## Contributing
+
+Small, focused PRs welcome - the one hard rule is that tests stay offline and keyless
+(logic modules inject their dependencies; `gh` and `personal_llm` imports stay lazy in
+the CLI only).
+
+## License
+
+[MIT](LICENSE).
