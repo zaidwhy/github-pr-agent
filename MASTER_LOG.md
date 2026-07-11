@@ -50,3 +50,19 @@ crash path or nondeterminism. Tests went 13 -> 32.
   `test_repo.py`. 32/32 pass offline.
 - **Live-verified:** `triage` on a missing repo and a malformed repo string, `report --repo` on a
   missing repo (warn + still write), and `analyze .` (venv/.git pruned) - all clean, correct codes.
+
+## 2026-07-11 - triage swarm-avoidance + soft-claim awareness (Tier 9 items 61-62)
+
+- **Why:** the AutoCTO sprint found half the "unclaimed" good-first-issues on hot repos
+  already had a PR in flight (gqlalchemy #253->#385, #293->#390). Triaging them wastes a
+  night and risks duplicate PRs.
+- **What:** `issues.py` gains `open_linked_pr_numbers()` (parse timeline cross-references
+  for OPEN PRs), `is_soft_claim()` + `SOFT_CLAIM_PATTERNS`, `enrich_claims()`, and an
+  `unclaimed_only` filter in `rank_issues` (covered issues dropped by default, or ranked
+  last under `--all`); soft claims de-rank by -1.5. `github.py` adds thin
+  `fetch_issue_timeline` / `fetch_latest_comment_body`. CLI `triage` enriches the top N
+  candidates (default 12) and shows `[PR#..; soft-claim]` flags.
+- **Tests:** 8 new offline (40 total, all green).
+- **Live-verified on memgraph/gqlalchemy:** default reported "all top candidates already
+  have PRs"; `--all` listed #253 [PR#385], #293 [PR#376,390], #252 [PR#392; soft-claim],
+  all ranked last. The tool now stops AutoCTO from duplicating even its own open PR (#392).
