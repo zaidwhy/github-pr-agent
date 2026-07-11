@@ -65,21 +65,66 @@ def triage(
     repo: str = typer.Argument(..., help="owner/repo"),
     label: str = typer.Option(None, "--label", help="Filter by a label, e.g. 'good first issue'."),
     limit: int = typer.Option(30, help="Max issues to fetch."),
+    unclaimed_only: bool = typer.Option(
+        True, "--unclaimed-only/--all",
+        help="Drop issues already covered by an open PR (default). --all keeps them (ranked last).",
+    ),
+    enrich: int = typer.Option(
+        12, help="How many top candidates to check for open PRs / soft claims (0 disables).",
+    ),
 ) -> None:
-    """List and rank open issues, best first-issue candidates first."""
-    from autocto.github import GhError, fetch_issues
-    from autocto.issues import parse_issues, rank_issues
+    """List and rank open issues, best first-issue candidates first.
+
+    Claim-aware: the top candidates are checked against their timeline for an already-open
+    cross-referenced PR (excluded under --unclaimed-only) and their latest comment for a soft
+    claim (de-ranked). This is the swarm-avoidance pass - most "unclaimed" issues on hot repos
+    already have a PR in flight.
+    """
+    from autocto.github import (
+        GhError, fetch_issue_timeline, fetch_issues, fetch_latest_comment_body,
+    )
+    from autocto.issues import (
+        enrich_claims, open_linked_pr_numbers, parse_issues, rank_issues,
+    )
 
     try:
-        ranked = rank_issues(parse_issues(fetch_issues(repo, label=label, limit=limit)))
+        issues = parse_issues(fetch_issues(repo, label=label, limit=limit))
     except GhError as exc:
         typer.echo(f"Error: {exc}")
         raise typer.Exit(1)
-    if not ranked:
+    if not issues:
         typer.echo("No open issues found.")
         return
+
+    # Enrich only the top base-ranked candidates - one timeline + one comment call each -
+    # so a 30-issue triage does not fan out into 60 API calls.
+    if enrich > 0:
+        top = [i for i, _ in rank_issues(issues, unclaimed_only=False)[:enrich]]
+        linked: dict[int, list[int]] = {}
+        latest: dict[int, str] = {}
+        for issue in top:
+            try:
+                linked[issue.number] = open_linked_pr_numbers(fetch_issue_timeline(repo, issue.number))
+                latest[issue.number] = fetch_latest_comment_body(repo, issue.number)
+            except GhError:
+                pass  # a partial enrichment is still better than none; leave this one clean
+        enrich_claims(issues, linked, latest)
+
+    ranked = rank_issues(issues, unclaimed_only=unclaimed_only)
+    if not ranked:
+        typer.echo("No unclaimed open issues found (all top candidates already have PRs).")
+        return
     for issue, score in ranked:
-        typer.echo(f"[{score:4.1f}] #{issue.number} {issue.title}  ({', '.join(issue.labels) or 'no labels'})")
+        flags = []
+        if issue.has_open_linked_pr:
+            flags.append("PR#" + ",".join(str(n) for n in issue.open_linked_prs))
+        if issue.soft_claim:
+            flags.append("soft-claim")
+        tag = f"  [{'; '.join(flags)}]" if flags else ""
+        typer.echo(
+            f"[{score:5.1f}] #{issue.number} {issue.title}  "
+            f"({', '.join(issue.labels) or 'no labels'}){tag}"
+        )
 
 
 @app.command()

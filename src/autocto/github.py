@@ -69,3 +69,51 @@ def fetch_issues(repo: str, label: str | None = None, limit: int = 30, timeout: 
     if not isinstance(data, list):
         raise GhError(f"Unexpected `gh` output for {repo}: expected a JSON array of issues.")
     return data
+
+
+def _gh_json(cmd: list[str], repo: str, timeout: int) -> object:
+    """Run a `gh` command and parse its JSON, raising GhError on any failure."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except FileNotFoundError as exc:
+        raise GhNotAvailable(
+            "The `gh` CLI was not found. Install GitHub CLI and run `gh auth login`."
+        ) from exc
+    except subprocess.TimeoutExpired as exc:
+        raise GhError(f"`gh` timed out after {timeout}s querying {repo}.") from exc
+    except OSError as exc:
+        raise GhError(f"Could not run `gh` for {repo}: {exc}") from exc
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout or "").strip() or "no error output"
+        raise GhError(f"`gh` failed for {repo} (exit {result.returncode}): {detail}")
+    try:
+        return json.loads(result.stdout or "null")
+    except json.JSONDecodeError as exc:
+        raise GhError(f"Could not parse `gh` output for {repo}: {exc}") from exc
+
+
+def fetch_issue_timeline(repo: str, number: int, timeout: int = 30) -> list[dict]:
+    """The timeline events for an issue (used to find cross-referenced open PRs)."""
+    if not gh_available():
+        raise GhNotAvailable(
+            "The `gh` CLI was not found. Install GitHub CLI and run `gh auth login`."
+        )
+    data = _gh_json(
+        ["gh", "api", f"repos/{repo}/issues/{number}/timeline", "--paginate"], repo, timeout
+    )
+    return data if isinstance(data, list) else []
+
+
+def fetch_latest_comment_body(repo: str, number: int, timeout: int = 30) -> str:
+    """The body of the most recent human comment on an issue (for soft-claim detection)."""
+    if not gh_available():
+        raise GhNotAvailable(
+            "The `gh` CLI was not found. Install GitHub CLI and run `gh auth login`."
+        )
+    data = _gh_json(
+        ["gh", "issue", "view", str(number), "--repo", repo, "--json", "comments"], repo, timeout
+    )
+    comments = (data or {}).get("comments") if isinstance(data, dict) else None
+    if not comments:
+        return ""
+    return comments[-1].get("body", "") or ""
