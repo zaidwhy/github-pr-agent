@@ -1,7 +1,7 @@
 # GitHub PR Agent - AutoCTO
 
 [![CI](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-32%20passed%20offline-brightgreen)
+![Tests](https://img.shields.io/badge/tests-39%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -77,12 +77,13 @@ opening a PR. Together, AutoCTO scopes the work and the skill does it.
 & "venv\Scripts\python" -m pytest tests/ -q
 ```
 
-32 tests. The logic modules (`repo`, `issues`, `report`, `plan`, `github`) take injected
-callables and fake data - no `gh`, network, or model needed - so the suite runs fully
-offline (CI runs it keyless on every push). Only the CLI touches `gh` and Personal LLM,
-and it imports them lazily. Hardened invariants: every `gh` failure becomes a readable
-`GhError` (exit 1, no traceback), the LLM degrades to a stub if the core is missing, and
-repo scanning is deterministic.
+39 tests (1 additional test skips gracefully if the sibling `personal_llm` core isn't
+installed alongside this repo). The logic modules (`repo`, `issues`, `report`, `plan`,
+`github`) take injected callables and fake data - no `gh`, network, or model needed - so
+the suite runs fully offline (CI runs it keyless on every push). Only the CLI touches
+`gh` and Personal LLM, and it imports them lazily. Hardened invariants: every `gh`
+failure becomes a readable `GhError` (exit 1, no traceback), the LLM degrades to a stub
+if the core is missing, and repo scanning is deterministic.
 
 ## Demo
 
@@ -93,9 +94,10 @@ beyond the Quickstart.
 
 ## Contributing
 
-Small, focused PRs welcome - the one hard rule is that tests stay offline and keyless
-(logic modules inject their dependencies; `gh` and `personal_llm` imports stay lazy in
-the CLI only).
+Small, focused PRs welcome - see [CONTRIBUTING.md](CONTRIBUTING.md) for the ground
+rules (the short version: tests stay offline and keyless, inject fakes, `gh` and
+`personal_llm` imports stay lazy in the CLI only). Bug and feature issue templates are
+under `.github/ISSUE_TEMPLATE/`.
 
 ## License
 
