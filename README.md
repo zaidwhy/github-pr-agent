@@ -1,7 +1,7 @@
 # GitHub PR Agent - AutoCTO
 
 [![CI](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-39%20passed%20offline-brightgreen)
+![Tests](https://img.shields.io/badge/tests-43%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -22,8 +22,8 @@ a hardening pass with the full 32-test suite) was reviewed and merged.
 
 - **`analyze`** - summarize a local repo: languages, dependency manifests, layout.
 - **`triage`** - pull open issues via the GitHub CLI and rank the best first-issue candidates.
-- **`report`** - a markdown engineering report (health checklist + languages + optional triage
-  + a short model-written assessment).
+- **`report`** - a markdown engineering report (health checklist + a deterministic benchmark
+  scorecard + languages + optional triage + a short model-written assessment).
 - **`plan`** - draft a PR implementation plan for one issue: the handoff artifact for `/github-pr`.
 
 Triage/report/plan reuse the authenticated `gh` CLI for GitHub data and the free Personal LLM
@@ -77,7 +77,7 @@ opening a PR. Together, AutoCTO scopes the work and the skill does it.
 & "venv\Scripts\python" -m pytest tests/ -q
 ```
 
-39 tests (1 additional test skips gracefully if the sibling `personal_llm` core isn't
+43 tests (1 additional test skips gracefully if the sibling `personal_llm` core isn't
 installed alongside this repo). The logic modules (`repo`, `issues`, `report`, `plan`,
 `github`) take injected callables and fake data - no `gh`, network, or model needed - so
 the suite runs fully offline (CI runs it keyless on every push). Only the CLI touches
