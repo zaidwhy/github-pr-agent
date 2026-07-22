@@ -28,6 +28,15 @@ def _plan_prompt(issue: Issue, analysis: RepoAnalysis) -> str:
     )
 
 
+def _credit_prior_discussion_block() -> str:
+    return (
+        "## Prior discussion\n"
+        "Someone has already commented interest in this issue without opening a PR "
+        "(e.g. \"I'd like to work on this\"). Credit that comment in the PR description - "
+        "link it or @-mention its author - instead of silently duplicating the conversation."
+    )
+
+
 def build_pr_plan(issue: Issue, analysis: RepoAnalysis, llm: LlmFn) -> str:
     approach = llm(_plan_prompt(issue, analysis)).strip()
     lines = [
@@ -37,6 +46,10 @@ def build_pr_plan(issue: Issue, analysis: RepoAnalysis, llm: LlmFn) -> str:
         f"- Issue: {issue.url}",
         f"- Labels: {', '.join(issue.labels) or 'none'}",
         "",
+    ]
+    if issue.soft_claim:
+        lines += [_credit_prior_discussion_block(), ""]
+    lines += [
         "## Proposed approach",
         approach,
         "",
