@@ -44,8 +44,9 @@ def benchmark_score(analysis: RepoAnalysis) -> dict[str, int]:
     present. The weighting is deliberately simple (equal split, no invented sophistication).
 
     Returns a dict of sub-score label -> points (0 or 25 each), plus a "Total" key that is
-    the sum of the sub-scores (0-100). A test-file-ratio / TODO-density signal is a separate,
-    more detailed benchmark left for a later task - not computed here.
+    the sum of the sub-scores (0-100). The test-file-ratio / TODO-density signal is a
+    separate, more detailed benchmark (see coverage_proxy_signal()) - deliberately not folded
+    into this bounded 0-100 total.
     """
     key = {k.lower() for k in analysis.key_files}
     dirs = {d.lower() for d in analysis.top_level_dirs}
@@ -69,6 +70,38 @@ def _benchmark_lines(analysis: RepoAnalysis) -> list[str]:
     lines.append(f"- **Total: {scores['Total']}/100**")
     lines.append("")
     return lines
+
+
+def coverage_proxy_signal(analysis: RepoAnalysis) -> dict[str, int | float | None]:
+    """Cheap, model-free proxy for how tested a repo looks: test-to-source file ratio plus
+    TODO/FIXME density. Not a real coverage number (no test runner, no line data) - a
+    directional signal only, over the same RepoAnalysis counts scan_repo already collects.
+    """
+    source = analysis.source_files
+    tests = analysis.test_files
+    return {
+        "source_files": source,
+        "test_files": tests,
+        "ratio": round(tests / source, 2) if source else None,
+        "todo_fixme_count": analysis.todo_fixme_count,
+        "todo_density": round(analysis.todo_fixme_count / source, 3) if source else None,
+    }
+
+
+def _test_coverage_lines(analysis: RepoAnalysis) -> list[str]:
+    signal = coverage_proxy_signal(analysis)
+    ratio = "n/a (no source files scanned)" if signal["ratio"] is None else f"{signal['ratio']:.2f}"
+    density = "n/a" if signal["todo_density"] is None else f"{signal['todo_density']:.3f} per source file"
+    return [
+        "## Test coverage proxy",
+        "",
+        f"- Source files: {signal['source_files']}",
+        f"- Test files: {signal['test_files']}",
+        f"- Test-to-source ratio: {ratio}",
+        f"- TODO/FIXME markers: {signal['todo_fixme_count']}",
+        f"- TODO/FIXME density: {density}",
+        "",
+    ]
 
 
 def _languages_table(analysis: RepoAnalysis) -> str:
@@ -116,6 +149,7 @@ def build_report(
         *[f"- {flag}" for flag in health_flags(analysis)],
         "",
         *_benchmark_lines(analysis),
+        *_test_coverage_lines(analysis),
     ]
     if ranked_issues:
         parts.append("## Open issues (top candidates)")

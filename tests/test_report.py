@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from autocto.issues import Issue
 from autocto.repo import RepoAnalysis
-from autocto.report import benchmark_score, build_report, health_flags
+from autocto.report import benchmark_score, build_report, coverage_proxy_signal, health_flags
 
 
 def _analysis(**kw):
@@ -15,6 +15,9 @@ def _analysis(**kw):
         key_files=["README.md"],
         dep_files=["pyproject.toml"],
         top_level_dirs=["src", "tests"],
+        source_files=8,
+        test_files=2,
+        todo_fixme_count=4,
     )
     base.update(kw)
     return RepoAnalysis(**base)
@@ -85,3 +88,36 @@ def test_build_report_includes_benchmark_section():
     assert "**Total: 75/100**" in md
     # Benchmark comes after the Health checklist, as the quantified version of it.
     assert md.index("## Health checklist") < md.index("## Benchmark")
+
+
+def test_coverage_proxy_signal_ratio_and_density():
+    signal = coverage_proxy_signal(_analysis(source_files=8, test_files=2, todo_fixme_count=4))
+    assert signal == {
+        "source_files": 8,
+        "test_files": 2,
+        "ratio": 0.25,
+        "todo_fixme_count": 4,
+        "todo_density": 0.5,
+    }
+
+
+def test_coverage_proxy_signal_no_source_files_is_not_a_division_error():
+    signal = coverage_proxy_signal(_analysis(source_files=0, test_files=0, todo_fixme_count=0))
+    assert signal["ratio"] is None
+    assert signal["todo_density"] is None
+
+
+def test_build_report_includes_test_coverage_proxy_section():
+    md = build_report(_analysis(source_files=8, test_files=2, todo_fixme_count=4))
+    assert "## Test coverage proxy" in md
+    assert "Test-to-source ratio: 0.25" in md
+    assert "TODO/FIXME markers: 4" in md
+    assert "TODO/FIXME density: 0.500 per source file" in md
+    # Comes after Benchmark, as a separate, more detailed signal (see benchmark_score's docstring).
+    assert md.index("## Benchmark") < md.index("## Test coverage proxy")
+
+
+def test_build_report_test_coverage_proxy_handles_no_source_files():
+    md = build_report(_analysis(source_files=0, test_files=0, todo_fixme_count=0))
+    assert "Test-to-source ratio: n/a (no source files scanned)" in md
+    assert "TODO/FIXME density: n/a" in md

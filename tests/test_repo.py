@@ -73,3 +73,31 @@ def test_empty_repo_has_no_primary_language(tmp_path):
     a = scan_repo(tmp_path / "empty", get_settings().ignore_dirs)
     assert a.total_files == 0
     assert a.primary_language is None
+
+
+def test_test_coverage_proxy_counts(tmp_path):
+    _write(tmp_path / "app.py")
+    _write(tmp_path / "util.py")
+    _write(tmp_path / "web" / "index.ts")
+    _write(tmp_path / "tests" / "test_app.py")  # test-dir + test_ prefix, counted once
+    _write(tmp_path / "web" / "index.test.ts")  # .test. naming convention, no test dir
+    _write(tmp_path / "README.md")  # not a _CODE_EXTS file, never counted either way
+
+    a = scan_repo(tmp_path, get_settings().ignore_dirs)
+    assert a.source_files == 3  # app.py, util.py, web/index.ts
+    assert a.test_files == 2  # tests/test_app.py, web/index.test.ts
+
+
+def test_test_coverage_proxy_todo_fixme_density(tmp_path):
+    _write(tmp_path / "app.py", "# TODO: refactor this\ndef f():\n    pass  # FIXME\n")
+    _write(tmp_path / "util.py", "def g():\n    return 1\n")
+
+    a = scan_repo(tmp_path, get_settings().ignore_dirs)
+    assert a.todo_fixme_count == 2
+    assert a.source_files == 2
+
+
+def test_test_coverage_proxy_ignores_lowercase_todo_in_prose(tmp_path):
+    _write(tmp_path / "app.py", "# a todo list feature, not a marker\n")
+    a = scan_repo(tmp_path, get_settings().ignore_dirs)
+    assert a.todo_fixme_count == 0
