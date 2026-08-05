@@ -8,6 +8,7 @@ descended into, and unreadable directories are skipped rather than raising).
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -30,6 +31,33 @@ _DEP_FILES = {
     "package.json", "cargo.toml", "go.mod", "pom.xml", "build.gradle", "gemfile",
 }
 
+# Extensions counted toward the test-coverage-proxy signal (source_files/test_files/
+# todo_fixme_count below) - a subset of _LANG_BY_EXT that excludes docs/style/config
+# formats (.md, .css, .html, .yml, ...) that aren't "source" for that signal's purpose.
+_CODE_EXTS = {
+    ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".rb",
+    ".c", ".h", ".cpp", ".cc", ".cs", ".php", ".swift", ".kt", ".sh",
+}
+_TEST_DIR_NAMES = {"test", "tests", "__tests__", "spec", "specs"}
+_TODO_FIXME_RE = re.compile(r"\b(?:TODO|FIXME)\b")
+
+
+def _is_test_file(fname: str, parent_dir_names: set[str]) -> bool:
+    """Test-file naming/location conventions: test_x.py, x_test.py, x.test.js, x.spec.ts,
+    or anything under a tests/test/__tests__/spec(s) directory at any depth."""
+    stem = Path(fname).stem.lower()
+    if stem.startswith("test_") or stem.endswith(("_test", ".test", "_spec", ".spec")):
+        return True
+    return bool(parent_dir_names & _TEST_DIR_NAMES)
+
+
+def _count_todo_fixme(fpath: Path) -> int:
+    try:
+        text = fpath.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return 0
+    return len(_TODO_FIXME_RE.findall(text))
+
 
 @dataclass
 class RepoAnalysis:
@@ -39,6 +67,11 @@ class RepoAnalysis:
     key_files: list[str] = field(default_factory=list)
     dep_files: list[str] = field(default_factory=list)
     top_level_dirs: list[str] = field(default_factory=list)
+    # Test-coverage-proxy signal (see report.coverage_proxy_signal): counts over _CODE_EXTS
+    # files only, so docs/style/config files never dilute the ratio.
+    source_files: int = 0
+    test_files: int = 0
+    todo_fixme_count: int = 0
 
     @property
     def primary_language(self) -> str | None:
@@ -69,9 +102,12 @@ def scan_repo(path: str | Path, ignore_dirs: tuple[str, ...] = ()) -> RepoAnalys
         if not top_level_captured:
             analysis.top_level_dirs = list(dirnames)
             top_level_captured = True
+        dirpath = Path(_dirpath)
+        parent_dir_names = {p.lower() for p in dirpath.relative_to(root).parts}
         for fname in filenames:
             analysis.total_files += 1
-            lang = _LANG_BY_EXT.get(Path(fname).suffix.lower())
+            suffix = Path(fname).suffix.lower()
+            lang = _LANG_BY_EXT.get(suffix)
             if lang:
                 analysis.languages[lang] = analysis.languages.get(lang, 0) + 1
             lname = fname.lower()
@@ -79,6 +115,12 @@ def scan_repo(path: str | Path, ignore_dirs: tuple[str, ...] = ()) -> RepoAnalys
                 analysis.key_files.append(fname)
             if lname in _DEP_FILES and fname not in analysis.dep_files:
                 analysis.dep_files.append(fname)
+            if suffix in _CODE_EXTS:
+                if _is_test_file(fname, parent_dir_names):
+                    analysis.test_files += 1
+                else:
+                    analysis.source_files += 1
+                analysis.todo_fixme_count += _count_todo_fixme(dirpath / fname)
 
     analysis.key_files.sort()
     analysis.dep_files.sort()
