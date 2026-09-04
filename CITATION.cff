@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it as below."
+title: "GitHub PR Agent - AutoCTO"
+authors:
+  - family-names: "Syed"
+    given-names: "Zaid Ali"
+date-released: 2026-07-04
+url: "https://github.com/zaidwhy/github-pr-agent"
+repository-code: "https://github.com/zaidwhy/github-pr-agent"
+license: MIT
+abstract: >
+  Repo analysis, issue triage, and PR planning agent built on the
+  Personal LLM memory/RAG kernel.
