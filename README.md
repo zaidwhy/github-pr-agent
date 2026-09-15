@@ -1,12 +1,12 @@
 # GitHub PR Agent - AutoCTO
 
-[![CI](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/syzayd/github-pr-agent/actions/workflows/ci.yml)
+[![CI](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml)
 ![Tests](https://img.shields.io/badge/tests-43%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **The AI Staff Engineer every repository deserves.** Project #3 in a larger local-first
-AI ecosystem built on the [Personal LLM](https://github.com/syzayd/personal-llm) core.
+AI ecosystem built on the [Personal LLM](https://github.com/zaidwhy/personal-llm) core.
 
 This repo is the **engineering-manager layer**: it understands a repository, reports on its
 health, triages its issues, and drafts a pull-request plan. It deliberately does **not** write
@@ -15,7 +15,7 @@ code generation is not - so implementation is handed to the **`/github-pr` Claud
 which does the real PR work (write the fix, run tests, open the PR after your approval).
 
 Its pattern is proven: the manager layer triaged a real issue, the implementer skill
-wrote the fix, and the resulting PR ([#2](https://github.com/syzayd/github-pr-agent/pull/2),
+wrote the fix, and the resulting PR ([#2](https://github.com/zaidwhy/github-pr-agent/pull/2),
 a hardening pass with the full 32-test suite) was reviewed and merged.
 
 ## What it does
@@ -34,8 +34,8 @@ router (Gemini free tier or local Ollama) only for the prose. No new API keys.
 Clone this repo and the core side by side, then install both:
 
 ```powershell
-git clone https://github.com/syzayd/personal-llm
-git clone https://github.com/syzayd/github-pr-agent
+git clone https://github.com/zaidwhy/personal-llm
+git clone https://github.com/zaidwhy/github-pr-agent
 cd github-pr-agent
 py -3.12 -m venv venv
 & "venv\Scripts\python" -m pip install -r requirements.txt
@@ -56,13 +56,13 @@ gh auth status
 & "venv\Scripts\python" -m autocto.interfaces.cli analyze ..\second-brain
 
 # Triage issues on any GitHub repo (best first-issue candidates first)
-& "venv\Scripts\python" -m autocto.interfaces.cli triage syzayd/second-brain --label "good first issue"
+& "venv\Scripts\python" -m autocto.interfaces.cli triage zaidwhy/second-brain --label "good first issue"
 
 # Full engineering report (local analysis + remote triage)
-& "venv\Scripts\python" -m autocto.interfaces.cli report ..\second-brain --repo syzayd/second-brain --out data\report.md
+& "venv\Scripts\python" -m autocto.interfaces.cli report ..\second-brain --repo zaidwhy/second-brain --out data\report.md
 
 # Draft a PR plan for one issue, then hand it to /github-pr to implement
-& "venv\Scripts\python" -m autocto.interfaces.cli plan syzayd/second-brain 12 --path ..\second-brain --out data\pr-plan.md
+& "venv\Scripts\python" -m autocto.interfaces.cli plan zaidwhy/second-brain 12 --path ..\second-brain --out data\pr-plan.md
 ```
 
 ## How it pairs with the skill
