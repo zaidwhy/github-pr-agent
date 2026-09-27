@@ -101,3 +101,22 @@ def test_test_coverage_proxy_ignores_lowercase_todo_in_prose(tmp_path):
     _write(tmp_path / "app.py", "# a todo list feature, not a marker\n")
     a = scan_repo(tmp_path, get_settings().ignore_dirs)
     assert a.todo_fixme_count == 0
+
+
+def test_primary_language_prefers_code_over_config_and_docs(tmp_path):
+    # jd/tenacity keeps 63 release-note YAML files beside 20 Python files; it is a Python project.
+    for i in range(5):
+        _write(tmp_path / "releasenotes" / f"note{i}.yaml")
+        _write(tmp_path / "docs" / f"page{i}.md")
+    _write(tmp_path / "tenacity" / "__init__.py")
+    a = scan_repo(tmp_path, get_settings().ignore_dirs)
+    assert a.primary_language == "Python"
+
+
+def test_primary_language_falls_back_to_any_file_type(tmp_path):
+    # a docs-only repository still reports what it is made of
+    _write(tmp_path / "a.md")
+    _write(tmp_path / "b.md")
+    _write(tmp_path / "c.yml")
+    a = scan_repo(tmp_path, get_settings().ignore_dirs)
+    assert a.primary_language == "Markdown"

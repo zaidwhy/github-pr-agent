@@ -3,7 +3,7 @@
 > Renamed 2026-09-27: the Python package was `autocto` and is now `github_pr_agent` (CLI `github-pr-agent`), so it no longer collides with [repo-autocto](https://github.com/zaidwhy/autocto), which installs a package and command of the same old name. Settings still read the `AUTOCTO_` prefix.
 
 [![CI](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-56%20passed%20offline-brightgreen)
+![Tests](https://img.shields.io/badge/tests-58%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 

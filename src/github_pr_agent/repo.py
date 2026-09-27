@@ -38,6 +38,7 @@ _CODE_EXTS = {
     ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".rb",
     ".c", ".h", ".cpp", ".cc", ".cs", ".php", ".swift", ".kt", ".sh",
 }
+_CODE_LANGS = {_LANG_BY_EXT[e] for e in _CODE_EXTS}
 _TEST_DIR_NAMES = {"test", "tests", "__tests__", "spec", "specs"}
 _TODO_FIXME_RE = re.compile(r"\b(?:TODO|FIXME)\b")
 
@@ -75,11 +76,16 @@ class RepoAnalysis:
 
     @property
     def primary_language(self) -> str | None:
-        """The most common language, ties broken alphabetically so the result is stable."""
+        """The most common programming language, ties broken alphabetically so the result is stable.
+
+        Config and docs formats (YAML, Markdown, CSS, ...) only count when a repository has no
+        code at all: a Python library with many release-note YAML files is a Python project.
+        """
         if not self.languages:
             return None
+        code = {k: v for k, v in self.languages.items() if k in _CODE_LANGS} or self.languages
         # Iterate keys in sorted order so max() resolves ties deterministically (first seen wins).
-        return max(sorted(self.languages), key=self.languages.__getitem__)
+        return max(sorted(code), key=code.__getitem__)
 
 
 def scan_repo(path: str | Path, ignore_dirs: tuple[str, ...] = ()) -> RepoAnalysis:

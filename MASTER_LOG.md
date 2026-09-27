@@ -80,3 +80,12 @@ crash path or nondeterminism. Tests went 13 -> 32.
   and uninstalling github-pr-agent leaves `autocto hotspots` working.
 - Callers updated: jarvis-launcher (config + verify-all), ai-ecosystem `run.ps1`, the `/github-pr`
   skill, lumi's design plan.
+
+## 2026-09-27 - Primary language counts code first
+
+- Found while recording a demo: `plan jd/tenacity 534` reported the primary language as YAML (63 release-note
+  YAML files against 20 Python files). `primary_language` now ranks programming languages (the `_CODE_EXTS` set)
+  and falls back to docs/config formats only for repositories with no code. 2 tests; `pytest -q` 58 passed.
+- Open, not fixed: the plan prompt only gives the model top-level directory names, so the drafted steps can
+  name files that do not exist (the tenacity run invented `tenacity/strategy.py` and `doc/issue-534.md`).
+  Passing a file listing would fix it; the demo GIF shows `triage` only until then.
