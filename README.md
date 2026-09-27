@@ -89,10 +89,14 @@ if the core is missing, and repo scanning is deterministic.
 
 ## Demo
 
-<!-- TODO(zaid): record a real 30-second GIF - `triage` a known repo, then `plan` one
-issue and show the generated pr-plan.md. Never fabricate. -->
-Demo GIF coming soon. Until then, `analyze` on any local repo runs offline with zero setup
-beyond the Quickstart.
+![Demo - analyze a checkout of jd/tenacity, then triage its open issues](docs/demo-triage.gif)
+
+Recorded 2026-09-27 from a real run: `analyze` on a checkout of jd/tenacity, then `triage`
+against its live issues (#644 is de-ranked because its latest comment is a soft claim). The
+output is the program's own; only the typing speed is rendered.
+
+<!-- TODO(zaid): add the `plan` half once plans are grounded in a real file listing. The
+2026-09-27 run on tenacity#534 named files that do not exist (see MASTER_LOG). -->
 
 ## Contributing
 
