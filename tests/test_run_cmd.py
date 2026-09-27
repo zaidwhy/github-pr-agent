@@ -24,7 +24,7 @@ def test_run_cmd_exists():
 
 def test_runs_the_help_action_matching_jarvis_config():
     text = _text()
-    assert "venv\\Scripts\\python -m autocto.interfaces.cli --help" in text
+    assert "venv\\Scripts\\python -m github_pr_agent.interfaces.cli --help" in text
 
 
 def test_no_env_var_line_since_config_sets_none():

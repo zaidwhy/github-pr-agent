@@ -6,7 +6,7 @@
 
 The GitHub PR Agent ships as **two halves that also run alone**:
 
-1. **AutoCTO** (this Python project, package `autocto`) - the engineering-manager layer. It reads a
+1. **AutoCTO** (this Python project, package `github_pr_agent`) - the engineering-manager layer. It reads a
    codebase, reports on its health, triages open issues, and drafts a PR plan. It never touches a
    PR itself.
 2. **The `/github-pr` skill** (Claude Code, keyless) - the implementer. It picks up an issue (or an

@@ -1,4 +1,4 @@
-"""AutoCTO - the engineering-manager layer of the GitHub PR Agent.
+"""GitHub PR Agent - the engineering-manager layer (named AutoCTO until 2026-09-27).
 
 AutoCTO understands a repository, reports on its health, triages its issues, and drafts a
 pull-request plan. It deliberately stops short of writing the code: on the free/local model

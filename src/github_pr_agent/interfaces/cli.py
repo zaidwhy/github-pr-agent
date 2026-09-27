@@ -1,4 +1,4 @@
-"""AutoCTO CLI - analyze, report, triage, and plan.
+"""GitHub PR Agent CLI - analyze, report, triage, and plan.
 
 The engineering-manager layer of the GitHub PR Agent. It understands a repo and drafts a PR
 plan, then hands implementation to the `/github-pr` skill. Personal LLM (used only for the
@@ -11,9 +11,9 @@ from pathlib import Path
 
 import typer
 
-from autocto.config import get_settings
+from github_pr_agent.config import get_settings
 
-app = typer.Typer(help="AutoCTO - understand a repo, report on it, triage issues, draft a PR plan.")
+app = typer.Typer(help="GitHub PR Agent - understand a repo, report on it, triage issues, draft a PR plan.")
 
 
 def _llm():
@@ -46,7 +46,7 @@ def _llm():
 @app.command()
 def analyze(path: Path = typer.Argument(Path("."), help="Local repo path.")) -> None:
     """Summarize a local repository (languages, deps, layout)."""
-    from autocto.repo import scan_repo
+    from github_pr_agent.repo import scan_repo
 
     try:
         a = scan_repo(path, get_settings().ignore_dirs)
@@ -80,10 +80,10 @@ def triage(
     claim (de-ranked). This is the swarm-avoidance pass - most "unclaimed" issues on hot repos
     already have a PR in flight.
     """
-    from autocto.github import (
+    from github_pr_agent.github import (
         GhError, fetch_issue_timeline, fetch_issues, fetch_latest_comment_body,
     )
-    from autocto.issues import (
+    from github_pr_agent.issues import (
         enrich_claims, open_linked_pr_numbers, parse_issues, rank_issues,
     )
 
@@ -134,8 +134,8 @@ def report(
     out: Path = typer.Option(None, help="Write the report here instead of printing."),
 ) -> None:
     """Write a markdown engineering report, optionally including issue triage."""
-    from autocto.repo import scan_repo
-    from autocto.report import build_report
+    from github_pr_agent.repo import scan_repo
+    from github_pr_agent.report import build_report
 
     try:
         analysis = scan_repo(path, get_settings().ignore_dirs)
@@ -144,8 +144,8 @@ def report(
         raise typer.Exit(1)
     ranked = []
     if repo:
-        from autocto.github import GhError, fetch_issues
-        from autocto.issues import parse_issues, rank_issues
+        from github_pr_agent.github import GhError, fetch_issues
+        from github_pr_agent.issues import parse_issues, rank_issues
 
         try:
             ranked = rank_issues(parse_issues(fetch_issues(repo)))
@@ -169,10 +169,10 @@ def plan(
     out: Path = typer.Option(None, help="Write the plan here instead of printing."),
 ) -> None:
     """Draft a PR plan for a specific issue - the handoff artifact for /github-pr."""
-    from autocto.github import GhError, fetch_issues
-    from autocto.issues import parse_issues
-    from autocto.plan import build_pr_plan
-    from autocto.repo import scan_repo
+    from github_pr_agent.github import GhError, fetch_issues
+    from github_pr_agent.issues import parse_issues
+    from github_pr_agent.plan import build_pr_plan
+    from github_pr_agent.repo import scan_repo
 
     try:
         issues = parse_issues(fetch_issues(repo, limit=100))

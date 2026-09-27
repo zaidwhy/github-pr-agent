@@ -66,3 +66,17 @@ crash path or nondeterminism. Tests went 13 -> 32.
 - **Live-verified on memgraph/gqlalchemy:** default reported "all top candidates already
   have PRs"; `--all` listed #253 [PR#385], #293 [PR#376,390], #252 [PR#392; soft-claim],
   all ranked last. The tool now stops AutoCTO from duplicating even its own open PR (#392).
+
+## 2026-09-27 - Package renamed autocto -> github_pr_agent
+
+- Why: repo-autocto (projects/autocto, on PyPI) also installs an import package and a CLI named
+  `autocto`. Installed together, pip merged both into one `site-packages/autocto/` without a
+  warning and the second CLI replaced the first; uninstalling either broke the other.
+- Change: `src/autocto/` -> `src/github_pr_agent/`, distribution `github-pr-agent`, CLI
+  `github-pr-agent`; `python -m github_pr_agent.interfaces.cli`. The `AUTOCTO_` settings prefix is
+  kept so existing settings keep working. `build/` is now gitignored.
+- Verified: `pytest -q` 56 passed (the README badge said 43; corrected). Both packages installed in
+  a scratch venv in both orders: each CLI is its own, `autocto/` holds only repo-autocto's modules,
+  and uninstalling github-pr-agent leaves `autocto hotspots` working.
+- Callers updated: jarvis-launcher (config + verify-all), ai-ecosystem `run.ps1`, the `/github-pr`
+  skill, lumi's design plan.

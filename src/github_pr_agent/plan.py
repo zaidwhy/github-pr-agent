@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from typing import Callable
 
-from autocto.issues import Issue
-from autocto.repo import RepoAnalysis
+from github_pr_agent.issues import Issue
+from github_pr_agent.repo import RepoAnalysis
 
 LlmFn = Callable[[str], str]
 

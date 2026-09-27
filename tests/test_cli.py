@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from autocto import github
-from autocto.interfaces import cli
+from github_pr_agent import github
+from github_pr_agent.interfaces import cli
 
 runner = CliRunner()
 

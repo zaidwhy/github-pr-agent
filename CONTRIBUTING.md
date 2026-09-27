@@ -11,7 +11,7 @@ and small, focused PRs are welcome.
    dependency or a network call. A PR that adds a networked or model-backed test will
    be asked to mock it.
 2. **`gh` and `personal_llm` imports stay lazy.** Only import them inside the CLI
-   command bodies (`src/autocto/interfaces/`), never at module top level elsewhere -
+   command bodies (`src/github_pr_agent/interfaces/`), never at module top level elsewhere -
    that is what keeps the core test suite fast and dependency-light.
 3. **Every `gh` failure becomes a readable `GhError`** (exit 1, no traceback). Keep new
    `gh` call sites consistent with that contract.

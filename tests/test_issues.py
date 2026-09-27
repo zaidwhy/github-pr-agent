@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from autocto.issues import (
+from github_pr_agent.issues import (
     Issue,
     enrich_claims,
     is_soft_claim,

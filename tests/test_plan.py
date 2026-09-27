@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from autocto.issues import Issue
-from autocto.plan import build_pr_plan
-from autocto.repo import RepoAnalysis
+from github_pr_agent.issues import Issue
+from github_pr_agent.plan import build_pr_plan
+from github_pr_agent.repo import RepoAnalysis
 
 
 def test_build_pr_plan():

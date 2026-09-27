@@ -9,7 +9,7 @@ import subprocess
 
 import pytest
 
-from autocto import github
+from github_pr_agent import github
 
 
 def _ok(stdout: str):

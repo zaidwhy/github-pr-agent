@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "autocto"
+name = "github-pr-agent"
 version = "0.1.0"
-description = "AutoCTO - the engineering-manager layer of the GitHub PR Agent: analyze, report, triage, plan."
+description = "GitHub PR Agent: analyze a repo, report on it, triage issues, draft a PR plan."
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Zaid Ali Syed" }]
@@ -22,7 +22,7 @@ dependencies = [
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-autocto = "autocto.interfaces.cli:app"
+github-pr-agent = "github_pr_agent.interfaces.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]

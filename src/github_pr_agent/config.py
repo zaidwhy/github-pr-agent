@@ -1,4 +1,4 @@
-"""Settings for AutoCTO. Env-overridable with the AUTOCTO_ prefix."""
+"""Settings for the GitHub PR Agent. Env-overridable with the AUTOCTO_ prefix (kept from its AutoCTO name so existing settings keep working)."""
 
 from __future__ import annotations
 

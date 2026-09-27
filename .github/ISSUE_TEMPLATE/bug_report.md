@@ -12,7 +12,7 @@ A clear description of what went wrong.
 **To reproduce**
 Steps to reproduce, ideally the exact command(s):
 ```powershell
-& "venv\Scripts\python" -m autocto.interfaces.cli ...
+& "venv\Scripts\python" -m github_pr_agent.interfaces.cli ...
 ```
 
 **Expected behavior**

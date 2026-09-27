@@ -1,4 +1,4 @@
-# GitHub PR Agent (AutoCTO) - Claude Instructions
+# GitHub PR Agent - Claude Instructions
 
 Engineering-manager layer of the GitHub PR Agent (project #3 in `../ROADMAP.md`). Analyzes a
 repo, reports on it, triages issues, and drafts a PR plan. Implementation is the `/github-pr`
@@ -8,7 +8,7 @@ skill's job, not this project's.
 
 ```powershell
 cd C:\Users\Asus\projects\ai-ecosystem\github-pr-agent
-& "venv\Scripts\python" -m autocto.interfaces.cli --help
+& "venv\Scripts\python" -m github_pr_agent.interfaces.cli --help
 ```
 
 ## Python environment

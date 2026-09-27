@@ -1,7 +1,9 @@
-# GitHub PR Agent - AutoCTO
+# GitHub PR Agent
+
+> Renamed 2026-09-27: the Python package was `autocto` and is now `github_pr_agent` (CLI `github-pr-agent`), so it no longer collides with [repo-autocto](https://github.com/zaidwhy/autocto), which installs a package and command of the same old name. Settings still read the `AUTOCTO_` prefix.
 
 [![CI](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-43%20passed%20offline-brightgreen)
+![Tests](https://img.shields.io/badge/tests-56%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -53,23 +55,23 @@ gh auth status
 
 ```powershell
 # Analyze any local repo
-& "venv\Scripts\python" -m autocto.interfaces.cli analyze ..\second-brain
+& "venv\Scripts\python" -m github_pr_agent.interfaces.cli analyze ..\second-brain
 
 # Triage issues on any GitHub repo (best first-issue candidates first)
-& "venv\Scripts\python" -m autocto.interfaces.cli triage zaidwhy/second-brain --label "good first issue"
+& "venv\Scripts\python" -m github_pr_agent.interfaces.cli triage zaidwhy/second-brain --label "good first issue"
 
 # Full engineering report (local analysis + remote triage)
-& "venv\Scripts\python" -m autocto.interfaces.cli report ..\second-brain --repo zaidwhy/second-brain --out data\report.md
+& "venv\Scripts\python" -m github_pr_agent.interfaces.cli report ..\second-brain --repo zaidwhy/second-brain --out data\report.md
 
 # Draft a PR plan for one issue, then hand it to /github-pr to implement
-& "venv\Scripts\python" -m autocto.interfaces.cli plan zaidwhy/second-brain 12 --path ..\second-brain --out data\pr-plan.md
+& "venv\Scripts\python" -m github_pr_agent.interfaces.cli plan zaidwhy/second-brain 12 --path ..\second-brain --out data\pr-plan.md
 ```
 
 ## How it pairs with the skill
 
-AutoCTO produces the plan; the `/github-pr` skill executes it. You can run either alone:
-`/github-pr` can find and fix an issue on its own, and AutoCTO can report/triage without ever
-opening a PR. Together, AutoCTO scopes the work and the skill does it.
+The agent's CLI produces the plan; the `/github-pr` skill executes it. You can run either alone:
+`/github-pr` can find and fix an issue on its own, and the CLI can report/triage without ever
+opening a PR. Together, the CLI scopes the work and the skill does it.
 
 ## Tests
 

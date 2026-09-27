@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from autocto.issues import Issue
-from autocto.repo import RepoAnalysis
-from autocto.report import benchmark_score, build_report, coverage_proxy_signal, health_flags
+from github_pr_agent.issues import Issue
+from github_pr_agent.repo import RepoAnalysis
+from github_pr_agent.report import benchmark_score, build_report, coverage_proxy_signal, health_flags
 
 
 def _analysis(**kw):

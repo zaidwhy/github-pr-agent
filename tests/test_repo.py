@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from autocto.config import get_settings
-from autocto.repo import scan_repo
+from github_pr_agent.config import get_settings
+from github_pr_agent.repo import scan_repo
 
 
 def _write(path: Path, text: str = "x") -> None:

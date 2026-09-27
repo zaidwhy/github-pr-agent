@@ -9,6 +9,6 @@ REM either.
 setlocal
 
 cd /d "%~dp0"
-venv\Scripts\python -m autocto.interfaces.cli --help
+venv\Scripts\python -m github_pr_agent.interfaces.cli --help
 
 endlocal
