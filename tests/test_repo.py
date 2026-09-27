@@ -120,3 +120,12 @@ def test_primary_language_falls_back_to_any_file_type(tmp_path):
     _write(tmp_path / "c.yml")
     a = scan_repo(tmp_path, get_settings().ignore_dirs)
     assert a.primary_language == "Markdown"
+
+
+def test_scan_records_relative_file_paths(tmp_path):
+    _write(tmp_path / "pkg" / "mod.py")
+    _write(tmp_path / "tests" / "test_mod.py")
+    _write(tmp_path / "node_modules" / "x.js")
+    a = scan_repo(tmp_path, get_settings().ignore_dirs)
+    assert "pkg/mod.py" in a.files and "tests/test_mod.py" in a.files
+    assert not any(f.startswith("node_modules") for f in a.files)

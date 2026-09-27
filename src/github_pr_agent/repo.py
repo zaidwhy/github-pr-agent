@@ -39,6 +39,8 @@ _CODE_EXTS = {
     ".c", ".h", ".cpp", ".cc", ".cs", ".php", ".swift", ".kt", ".sh",
 }
 _CODE_LANGS = {_LANG_BY_EXT[e] for e in _CODE_EXTS}
+# Cap on recorded paths, so a huge monorepo cannot blow up memory or the plan prompt.
+_MAX_FILES = 5000
 _TEST_DIR_NAMES = {"test", "tests", "__tests__", "spec", "specs"}
 _TODO_FIXME_RE = re.compile(r"\b(?:TODO|FIXME)\b")
 
@@ -73,6 +75,8 @@ class RepoAnalysis:
     source_files: int = 0
     test_files: int = 0
     todo_fixme_count: int = 0
+    # Relative POSIX paths of code, docs and project files: what a plan is allowed to name.
+    files: list[str] = field(default_factory=list)
 
     @property
     def primary_language(self) -> str | None:
@@ -117,6 +121,8 @@ def scan_repo(path: str | Path, ignore_dirs: tuple[str, ...] = ()) -> RepoAnalys
             if lang:
                 analysis.languages[lang] = analysis.languages.get(lang, 0) + 1
             lname = fname.lower()
+            if (lang or lname in _KEY_FILES or lname in _DEP_FILES) and len(analysis.files) < _MAX_FILES:
+                analysis.files.append((dirpath / fname).relative_to(root).as_posix())
             if lname in _KEY_FILES and fname not in analysis.key_files:
                 analysis.key_files.append(fname)
             if lname in _DEP_FILES and fname not in analysis.dep_files:
@@ -130,4 +136,5 @@ def scan_repo(path: str | Path, ignore_dirs: tuple[str, ...] = ()) -> RepoAnalys
 
     analysis.key_files.sort()
     analysis.dep_files.sort()
+    analysis.files.sort()
     return analysis

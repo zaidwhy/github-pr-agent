@@ -89,3 +89,15 @@ crash path or nondeterminism. Tests went 13 -> 32.
 - Open, not fixed: the plan prompt only gives the model top-level directory names, so the drafted steps can
   name files that do not exist (the tenacity run invented `tenacity/strategy.py` and `doc/issue-534.md`).
   Passing a file listing would fix it; the demo GIF shows `triage` only until then.
+
+## 2026-09-27 - Plans are grounded in the checkout's real files
+
+- `scan_repo` records relative file paths (code, docs, project files; capped at 5000). The plan prompt lists
+  the files most relevant to the issue (word overlap with title and body) and allows only those, or
+  `new file: <path>`.
+- After generation, every path-like token in the approach is checked against the checkout: a full path must
+  exist, a bare name must match exactly one file, a directory must exist, or the path must be declared new.
+  Anything else is listed under **Paths to check**; an ambiguous bare name lists its candidates.
+- Live runs of `plan jd/tenacity 534`: before, the plan invented `tenacity/strategy.py` and `doc/issue-534.md`
+  with nothing to catch them; after, every full path named existed on disk, and the guard flagged the rest.
+- Tests: 7 new (65 total). The demo GIF now includes the `plan` step.

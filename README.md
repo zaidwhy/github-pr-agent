@@ -3,7 +3,7 @@
 > Renamed 2026-09-27: the Python package was `autocto` and is now `github_pr_agent` (CLI `github-pr-agent`), so it no longer collides with [repo-autocto](https://github.com/zaidwhy/autocto), which installs a package and command of the same old name. Settings still read the `AUTOCTO_` prefix.
 
 [![CI](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-58%20passed%20offline-brightgreen)
+![Tests](https://img.shields.io/badge/tests-65%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -89,14 +89,13 @@ if the core is missing, and repo scanning is deterministic.
 
 ## Demo
 
-![Demo - analyze a checkout of jd/tenacity, then triage its open issues](docs/demo-triage.gif)
+![Demo - analyze a checkout of jd/tenacity, triage its open issues, then plan #534](docs/demo-triage.gif)
 
-Recorded 2026-09-27 from a real run: `analyze` on a checkout of jd/tenacity, then `triage`
-against its live issues (#644 is de-ranked because its latest comment is a soft claim). The
-output is the program's own; only the typing speed is rendered.
-
-<!-- TODO(zaid): add the `plan` half once plans are grounded in a real file listing. The
-2026-09-27 run on tenacity#534 named files that do not exist (see MASTER_LOG). -->
+Recorded 2026-09-27 from a real run: `analyze` on a checkout of jd/tenacity, `triage` against
+its live issues (#644 is de-ranked because its latest comment is a soft claim), then `plan` for
+#534. The plan names the real `tenacity/retry.py`; the one file it proposes without declaring it
+as new (`test_fix_retries.py`) is listed under **Paths to check**. The output is the program's
+own; only the typing speed is rendered.
 
 ## Contributing
 
