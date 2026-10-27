@@ -1,4 +1,7 @@
-<img src=".github/plate.svg" alt="GitHub PR Agent: The planning half of a pull-request agent: analyze, triage, plan. 84 tests; imports the personal-llm kernel; no API key in CI. Core strip: 31 commits over 13 weeks, Jul 2026 to Sep 2026." width="100%">
+<picture>
+<source media="(max-width: 600px)" srcset=".github/plate-narrow.svg">
+<img src=".github/plate.svg" alt="GitHub PR Agent: The planning half of a pull-request agent: analyze, triage, plan. 84 tests; imports the personal-llm kernel; no API key in CI. Core strip: 33 commits over 18 weeks, Jul 2026 to Oct 2026." width="100%">
+</picture>
 
 # GitHub PR Agent
 
