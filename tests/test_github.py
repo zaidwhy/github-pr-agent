@@ -97,3 +97,32 @@ def test_happy_path_returns_parsed_list(monkeypatch):
     )
     out = github.fetch_issues("owner/repo")
     assert out == [{"number": 1, "title": "x"}]
+
+
+@pytest.mark.parametrize("repo", ["a/b/c", "owner/", "/name", "owner/../x", "own er/name", "owner/name?x=1"])
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda r: github.fetch_issues(r),
+        lambda r: github.fetch_issue_timeline(r, 1),
+        lambda r: github.fetch_latest_comment_body(r, 1),
+    ],
+    ids=["issues", "timeline", "comment"],
+)
+def test_malformed_repo_rejected_before_shelling_out(monkeypatch, repo, call):
+    # The timeline call builds a `gh api repos/{repo}/...` path, so a stray slash or ".."
+    # would reach a different endpoint; every fetcher rejects it before gh runs.
+    _have_gh(monkeypatch)
+
+    def never(*_a, **_k):
+        raise AssertionError("gh must not be invoked for a malformed repo")
+
+    monkeypatch.setattr(github.subprocess, "run", never)
+    with pytest.raises(github.GhError, match="owner/name"):
+        call(repo)
+
+
+def test_dotted_and_dashed_names_are_accepted(monkeypatch):
+    _have_gh(monkeypatch)
+    monkeypatch.setattr(github.subprocess, "run", lambda *_a, **_k: _ok("[]"))
+    assert github.fetch_issues("my-org/repo.name_2") == []

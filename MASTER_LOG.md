@@ -101,3 +101,8 @@ crash path or nondeterminism. Tests went 13 -> 32.
 - Live runs of `plan jd/tenacity 534`: before, the plan invented `tenacity/strategy.py` and `doc/issue-534.md`
   with nothing to catch them; after, every full path named existed on disk, and the guard flagged the rest.
 - Tests: 7 new (65 total). The demo GIF now includes the `plan` step.
+
+## 2026-10-28 night - repository name validation
+
+- Probed the CLI: `triage a/b/c` passed the old check (any string containing a slash) and failed inside `gh` with "error connecting to a", which points at the network instead of the input. `fetch_issue_timeline` and `fetch_latest_comment_body` had no check at all, and the timeline call builds a `gh api repos/{repo}/...` path, so `owner/../x` would reach a different endpoint.
+- Fix: `_require_repo` in github.py (letters, digits, `-`, `_`, `.`; exactly one slash; no `.` or `..` segment), called by all three fetchers before gh runs. 19 tests (written first, 18 failed before the fix); 83 passed, 1 skipped (84 collected); ruff clean; live `triage zaidwhy/recall` still works.

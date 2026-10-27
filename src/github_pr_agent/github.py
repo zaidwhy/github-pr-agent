@@ -11,6 +11,7 @@ catch one exception type and exit cleanly.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 
@@ -27,13 +28,22 @@ def gh_available() -> bool:
     return shutil.which("gh") is not None
 
 
+# GitHub owner and repository names: letters, digits, '-', '_' and '.', never '.' or '..' alone.
+# Checked before any gh call because fetch_issue_timeline interpolates the name into an API path.
+_REPO_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
+
+
+def _require_repo(repo: str) -> None:
+    if not repo or not _REPO_RE.fullmatch(repo) or any(part in (".", "..") for part in repo.split("/")):
+        raise GhError(f"Expected a repository as 'owner/name', got: {repo!r}")
+
+
 def fetch_issues(repo: str, label: str | None = None, limit: int = 30, timeout: int = 60) -> list[dict]:
     """Return open issues for `owner/repo` as a list of dicts (gh's JSON output).
 
     Raises GhNotAvailable if the CLI is missing, or GhError for any other failure.
     """
-    if not repo or "/" not in repo:
-        raise GhError(f"Expected a repository as 'owner/name', got: {repo!r}")
+    _require_repo(repo)
     if limit < 1:
         raise GhError(f"limit must be a positive integer, got: {limit}")
     if not gh_available():
@@ -94,6 +104,7 @@ def _gh_json(cmd: list[str], repo: str, timeout: int) -> object:
 
 def fetch_issue_timeline(repo: str, number: int, timeout: int = 30) -> list[dict]:
     """The timeline events for an issue (used to find cross-referenced open PRs)."""
+    _require_repo(repo)
     if not gh_available():
         raise GhNotAvailable(
             "The `gh` CLI was not found. Install GitHub CLI and run `gh auth login`."
@@ -106,6 +117,7 @@ def fetch_issue_timeline(repo: str, number: int, timeout: int = 30) -> list[dict
 
 def fetch_latest_comment_body(repo: str, number: int, timeout: int = 30) -> str:
     """The body of the most recent human comment on an issue (for soft-claim detection)."""
+    _require_repo(repo)
     if not gh_available():
         raise GhNotAvailable(
             "The `gh` CLI was not found. Install GitHub CLI and run `gh auth login`."

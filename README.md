@@ -1,11 +1,11 @@
-<img src=".github/plate.svg" alt="GitHub PR Agent: The planning half of a pull-request agent: analyze, triage, plan. 65 tests; imports the personal-llm kernel; no API key in CI. Core strip: 31 commits over 13 weeks, Jul 2026 to Sep 2026." width="100%">
+<img src=".github/plate.svg" alt="GitHub PR Agent: The planning half of a pull-request agent: analyze, triage, plan. 84 tests; imports the personal-llm kernel; no API key in CI. Core strip: 31 commits over 13 weeks, Jul 2026 to Sep 2026." width="100%">
 
 # GitHub PR Agent
 
 > Renamed 2026-09-27: the Python package was `autocto` and is now `github_pr_agent` (CLI `github-pr-agent`), so it no longer collides with [repo-autocto](https://github.com/zaidwhy/autocto), which installs a package and command of the same old name. Settings still read the `AUTOCTO_` prefix.
 
 [![CI](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zaidwhy/github-pr-agent/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-65%20passed%20offline-brightgreen)
+![Tests](https://img.shields.io/badge/tests-84%20passed%20offline-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
