@@ -1,3 +1,5 @@
+<img src=".github/plate.svg" alt="GitHub PR Agent: The planning half of a pull-request agent: analyze, triage, plan. 65 tests; imports the personal-llm kernel; no API key in CI. Core strip: 31 commits over 13 weeks, Jul 2026 to Sep 2026." width="100%">
+
 # GitHub PR Agent
 
 > Renamed 2026-09-27: the Python package was `autocto` and is now `github_pr_agent` (CLI `github-pr-agent`), so it no longer collides with [repo-autocto](https://github.com/zaidwhy/autocto), which installs a package and command of the same old name. Settings still read the `AUTOCTO_` prefix.
@@ -107,3 +109,7 @@ under `.github/ISSUE_TEMPLATE/`.
 ## License
 
 [MIT](LICENSE).
+
+---
+
+<sub>One plate from the survey at [github.com/zaidwhy](https://github.com/zaidwhy). The strip on the plate above is this repository's own commit history, one band per week.</sub>
